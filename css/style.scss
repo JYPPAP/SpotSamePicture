@@ -1,2 +1,132 @@
 @charset "utf-8";
 
+.wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.content_wrap {
+  width: 1200px;
+  height: 1200px;
+  margin: 10px auto;
+
+}
+
+/* 위치 */
+p {
+  text-align: center;
+}
+
+.btn_wrap {
+  button {
+    display: none;
+    padding: 10px;
+    margin: 10px;
+
+    &:first-child {
+      display: inline-block;
+    }
+  }
+}
+
+#dashBoard {
+  color: blue;
+  text-align: center;
+}
+
+.play_wrap {
+  margin-top: 20px;
+
+  &:after {
+    display: block;
+    clear: both;
+    content: '';
+  }
+}
+
+/* 같은그림 출력 창 */
+#cards {
+  float: left;
+  width: 800px;
+  height: 800px;
+  border: 1px solid #000;
+
+  &:after {
+    display: block;
+    clear: both;
+    content: '';
+  }
+
+  .card {
+    position: relative;
+    float: left;
+    width: 25%;
+    height: 25%;
+    border-bottom: 1px solid #000;
+    border-left: 1px solid #000;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    /* 하단 중복 선 제거 */
+    &:nth-child(13),
+    &:nth-child(14),
+    &:nth-child(15),
+    &:nth-child(16) {
+      border-bottom: none;
+    }
+
+    /* 우측 중복 선 제거 */
+    &:nth-child(1),
+    &:nth-child(5),
+    &:nth-child(9),
+    &:nth-child(13) {
+      border-left: none;
+    }
+
+    .face {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      transition: 0.5s;
+      backface-visibility: hidden;
+      font-size: 100px;
+      line-height: 200px;
+      text-align: center;
+    }
+
+    .face_front { transform: rotateY(0deg);}
+    .face_back { transform: rotateY(-180deg);}
+
+    &.active .face_front { transform: rotateY(180deg);}
+    &.active .face_back { transform: rotateY(0deg);}
+  }
+}
+
+/* Score 출력 창 */
+#scoreBoard {
+  display: inline-block;
+  width: 400px;
+  padding-left: 20px;
+
+  tr {
+    display: block;
+    width: 380px;
+    margin-bottom: 5px;
+    border: 1px solid #000;
+
+    th,
+    td {
+      display: inline-block;
+      width: 100px;
+      padding: 5px;
+      font-size: 15px;
+      text-align: center;
+      border-left: 1px solid #000;
+
+      &:first-child {
+        width: 160px;
+        border-left: none;
+      }
+    }
+  }
+}
