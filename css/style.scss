@@ -5,7 +5,7 @@
   height: 100%;
 }
 
-.content_wrap {
+#content_wrap {
   width: 1200px;
   height: 1200px;
   margin: 10px auto;
@@ -17,7 +17,9 @@ p {
   text-align: center;
 }
 
-.btn_wrap {
+#btn_wrap {
+  text-align: center;
+
   button {
     display: none;
     padding: 10px;
@@ -34,6 +36,13 @@ p {
   text-align: center;
 }
 
+#playInfo {
+  margin-top: 10px;
+  font-size: 20px;
+}
+#playTime {
+  display: none;
+}
 .play_wrap {
   margin-top: 20px;
 
@@ -55,6 +64,10 @@ p {
     display: block;
     clear: both;
     content: '';
+  }
+
+  >* {
+    display: none;
   }
 
   .card {
@@ -92,13 +105,39 @@ p {
       font-size: 100px;
       line-height: 200px;
       text-align: center;
+      img {
+        width: 99.9999%;
+        height: 99.9999%;
+        user-select: none;
+        // box-sizing: border-box;
+        // border: 0;
+        // outline: 0;
+      }
     }
 
-    .face_front { transform: rotateY(0deg);}
-    .face_back { transform: rotateY(-180deg);}
+    .face_front {
+      transform: rotateY(0deg);
+      user-select: none;
+    }
 
-    &.active .face_front { transform: rotateY(180deg);}
-    &.active .face_back { transform: rotateY(0deg);}
+    .face_back {
+      transform: rotateY(-180deg);
+    }
+
+    &:active .face_front {
+      transform: rotateY(180deg);
+    }
+
+    &:active .face_back {
+      transform: rotateY(0deg);
+    }
+    // &.active .face_front {
+    //   transform: rotateY(180deg);
+    // }
+
+    // &.active .face_back {
+    //   transform: rotateY(0deg);
+    // }
   }
 }
 
