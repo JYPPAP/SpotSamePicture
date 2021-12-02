@@ -7,7 +7,7 @@
 
 #content_wrap {
   width: 1200px;
-  height: 1200px;
+  height: 900px;
   margin: 10px auto;
 
 }
@@ -68,19 +68,19 @@ p {
     content: '';
   }
 
-  // >* {
-  //   // display: none;
-  // }
+  >* {
+    display: none;
+  }
 
   .card {
     position: relative;
     float: left;
     width: 25%;
     height: 25%;
-    border-bottom: 1px solid #000;
-    border-left: 1px solid #000;
-    box-sizing: border-box;
     cursor: pointer;
+    border-bottom: 2px solid #000;
+    border-left: 2px solid #000;
+    box-sizing: border-box;
 
     /* 하단 중복 선 제거 */
     &:nth-child(13),
@@ -99,23 +99,14 @@ p {
     }
 
     .face {
+      position: absolute;
       width: 100%;
       height: 100%;
-      position: absolute;
-      transition: 0.1s;
-      backface-visibility: hidden;
       font-size: 100px;
       line-height: 200px;
       text-align: center;
-
-      img {
-        width: 99.9999%;
-        height: 99.9999%;
-        user-select: none;
-        // box-sizing: border-box;
-        // border: 0;
-        // outline: 0;
-      }
+      transition: 0.1s;
+      backface-visibility: hidden;
     }
 
     .face_front {
@@ -124,6 +115,9 @@ p {
     }
 
     .face_back {
+      // background-image: url(../images/01.jpg);
+      overflow: hidden;
+      background: no-repeat center;
       transform: rotateY(-180deg);
     }
 
@@ -161,7 +155,8 @@ p {
     td {
       display: inline-block;
       width: 100px;
-      padding: 5px;
+      padding: 5px 0;
+      overflow: hidden;
       font-size: 15px;
       text-align: center;
       border-left: 1px solid #000;
