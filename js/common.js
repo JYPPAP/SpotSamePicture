@@ -117,23 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
   /*##################
       랜덤 배치
   ##################*/
-  function mixImage() {
-    shuffle(basicArray);
-    console.log(basicArray);
-    mixText = "";
-    for (var i = 0; i < basicArray.length; i++) {
-      /* 여기서 카드의 위치를 옮겨야지, 배경이미지를 옮기는건 아닌 것 같음. */
-      conso
-      mixText += card[basicArray[i]].innerHTML;
-    }
-    console.log("####");
-    console.log("mixText");
-    console.log(mixText);
-    // cards.innerHTML = mixText;
-    shuffle(card);
-
-    showImage();
-  }
 
   function shuffle(array) {
     for (var index = array.length - 1; index > 0; index--) {
@@ -144,6 +127,16 @@ document.addEventListener("DOMContentLoaded", function () {
       array[index] = array[randomPosition];
       array[randomPosition] = temporary;
     }
+  }
+
+  function mixImage() {
+    shuffle(basicArray);
+    console.log("basicArray");
+    console.log(basicArray);
+    for (var i = 0; i < basicArray.length; i++) {
+        backFace[basicArray[i]].style.backgroundImage = "url(../images/0"+ ((i%8)+1) + ".jpg)";
+    }
+    showImage();
   }
 
   function showImage() {
@@ -166,18 +159,18 @@ document.addEventListener("DOMContentLoaded", function () {
     var target = e.target
     var targetImage = target.nextElementSibling;
     var targetCard = target.parentNode;
-    console.log("");
-    console.log("targetImage");
-    console.log(targetImage.style.backgroundImage);
-    console.log("target");
-    console.log(target);
-    console.log("card");
-    console.log(card);
+    // console.log("");
+    // console.log("targetImage");
+    // console.log(targetImage.style.backgroundImage);
+    // console.log("target");
+    // console.log(target);
+    // console.log("card");
+    // console.log(card);
     targetCard.className += " active";
 
     if (checkFlag) {
-
       console.log("#################");
+      console.log(checkFlag);
       console.log("checkTrue");
       if (targetImage.className == prevImage.className) {
         console.log("#################");
@@ -198,8 +191,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 1000);
       }
     }
-    console.log("clickFlag");
-    console.log(clickFlag);
+    console.log("clickFlag : " + clickFlag);
+    console.log();
     console.log("prevImage");
     console.log(prevImage);
     checkFlag = true;
