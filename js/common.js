@@ -51,7 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   // localStorage.setItem("score", 추가될 값(배열 형태로 저장해야 함.));
   /* prompt로 값 입력받을 때 파싱해서 ","가 들어있으면 다시 작성하라고 하기. 가능하다면 alert를 띄워서 특수문자 입력하면 안된다고 퉁쳐도 괜찮을 것 같음. 아니면 영어, 한국어, 숫자만 입력할 수 있도록 확인 후 다시 입력하도록 만드는 것도 나쁘진 않을 것 같음. */
-
+  // score에 값이 없을 때 어떻게 할  것인지.
+  // 일단 split 하는 부분을 for 문으로 분리해야 함. 값이 있을 때에만 정상적으로 적용될 수 있도록 만들기.
   var score = localStorage.getItem("score");
   var splitScore = score.split(/\,/g);
   var total = splitScore.length / 3;
