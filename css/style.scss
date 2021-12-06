@@ -36,13 +36,8 @@ p {
   text-align: center;
 }
 
-#playInfo {
-  margin-top: 10px;
-  font-size: 20px;
-}
-
 #playTime {
-  display: none;
+  margin-top: 10px;
 }
 
 .play_wrap {
@@ -72,14 +67,21 @@ p {
     display: none;
   }
 
+  #playInfo {
+    display: block;
+    font-size: 20px;
+    text-align: center;
+    line-height: 800px;
+  }
+
   .card {
     position: relative;
     float: left;
     width: 25%;
     height: 25%;
     cursor: pointer;
-    border-bottom: 2px solid #000;
-    border-left: 2px solid #000;
+    border-bottom: 1px solid #000;
+    border-left: 1px solid #000;
     box-sizing: border-box;
 
     /* 하단 중복 선 제거 */
@@ -126,6 +128,14 @@ p {
     }
 
     &.active .face_back {
+      transform: rotateY(0deg);
+    }
+
+    &.clear .face_front {
+      transform: rotateY(180deg);
+    }
+
+    &.clear .face_back {
       transform: rotateY(0deg);
     }
 
