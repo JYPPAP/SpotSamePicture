@@ -9,10 +9,11 @@ document.addEventListener("DOMContentLoaded", function () {
   var pauseBtn = button[2];
   var restartBtn = button[3];
   var mixBtn = button[4];
+  var btnArray = [];
 
   var score = doc.getElementById("score");
   var playCount = doc.getElementById("playCount");
-  var playTimeWrap = doc.getElementsByClassName("playTimeWrap");
+  var playTimeWrap = doc.getElementsByClassName("playTimeWrap")[0];
   var playTime = doc.getElementById("playTime");
 
   // 카드관련 변수
@@ -47,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // localStorage.clear();
   function setScoreBoard() {
     var scoreItem = localStorage.getItem("score");
-    var basicScore = "<tr><th>이름</th><th>Score</th><th>소요시간</th></tr>"
+    var scoreHeader = "<tr><th>이름</th><th>Score</th><th>소요시간</th></tr>"
     console.log(scoreItem);
     if (typeof (scoreItem) === "string") {
       // console.log("score has value");
@@ -58,11 +59,12 @@ document.addEventListener("DOMContentLoaded", function () {
         for (var i = 0; i < total; i++) {
           scoreText += "<tr><td>" + splitScore[(i * 3)] + "</td><td>" + splitScore[(i * 3) + 1] + "</td><td>" + splitScore[(i * 3) + 2] + "</td></tr>"
         }
-        scoreBoard.innerHTML = basicScore + scoreText;
+        scoreBoard.innerHTML = scoreHeader + scoreText;
       } else {
         console.log("가져온 값에 오류가 있습니다.");
       }
     } else {
+      scoreBoard.innerHTML = scoreHeader;
       console.log("저장된 score가 없음.");
     }
   };
@@ -104,12 +106,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function showImage() {
-    /* 이 부분에서도 이미지를 어떻게 처리할 것인지.
-
-     */
-    /* 
-    섞고난 다음 clear가 없는 카드의 배열?을 저장해서 출력?
-     */
     for (var i = 0; i < card.length; i++) {
       frontFace[i].className = "face face_front active";
       setTimeout(function () {
@@ -198,8 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var endName = prompt("게임이 종료되었습니다.\n이름을 입력해주세요", "(콤마 , )제외");
     // playTime.textContent = 40;
     // score.textContent = 120;
-    var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "초";
-    var endTime = playTime.textContent + "점";
+    var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "점";
+    var endTime = playTime.textContent + "초";
     console.log(typeof (endName));
 
     // var parseName = (/[\w|ㄱ-ㅎ|가-힣|][^\,]/g).test(endName);
@@ -237,18 +233,24 @@ document.addEventListener("DOMContentLoaded", function () {
   /*##################
       button Click
   ##################*/
+  function showBtn(array) {
+    for (var i = 0; i < array.length; i++) {
+      if (array[i] === 1) {
+        button[i].style.display = "inline";
+      } else {
+        button[i].style.display = "none";
+      }
+    }
+  }
 
   startBtn.onclick = function () {
     /* 버튼 숨기고 보여주기 */
+    btnArray = [0, 1, 1, 0, 1];
+    showBtn(btnArray);
     for (var i = 0; i < card.length; i++) {
       card[i].style.display = "block";
     }
     playInfo.style.display = "none";
-    for (var i = 0; i < button.length; i++) {
-      button[i].style.display = "inline";
-    }
-    startBtn.style.display = "none";
-    restartBtn.style.display = "none";
 
     /*##########
         AJAX
@@ -275,19 +277,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         console.log("Work1");
         mixImage();
+        showCount();
       } else {
         console.log("[" + xhr.status + "] : " + xhr.statusText);
       }
     }
 
-    /* 아래에 시작시 호출될 함수 작성하기 */
-    /* 초기화 */
-    // initPlay();
-
     /* 시간같은 경우는 setInterval을 이용하고 게임이 종료되었을 때 clearInterval 한 뒤 값을 가져오면 될 것 같음.
     아니면 시계표시 관련해서 찾아본 뒤 값을 가져오는 방법으로 작성해도 괜찮을 것 같음.
      */
-    showCount();
   };
 
   function showCount() {
@@ -303,44 +301,55 @@ document.addEventListener("DOMContentLoaded", function () {
       }, (i * 1000));
     }
   }
-  var intervalTime = setInterval(changeTime, 1000);
+  var intervalTime;
 
   function startCount() {
     console.log("Count START !!!!!");
-    playCount.style.display = "none";
-    playTimeWrap[0].style.display = "block";
 
-    intervalTime = setInterval(changeTime(), 1000);
+
+    playCount.style.display = "none";
+    playTimeWrap.style.display = "block";
+
+    intervalTime = setInterval(changeTime, 1000);
   }
 
   function changeTime() {
     var time = Number(playTime.textContent);
-    playTime.textContent = time;
     time--;
+    playTime.textContent = time;
+    console.log(time);
+    console.log(playTime.textContent);
+    if (time < 1) {
+      gameEnd();
+      clearInterval(intervalTime);
+    }
   }
   stopBtn.onclick = function () {
     /* 게임을 종료하고 초기화면으로 돌아가기. */
+    btnArray = [1, 0, 0, 0, 0];
+    showBtn(btnArray);
     for (var i = 0; i < buttons.length; i++) {
       button[i].style.display = "none";
     }
     startBtn.style.display = "inline";
+    /* 일단 임시로 새로고침할 수 있도록 작성함. */
+    location.reload();
   };
 
   pauseBtn.onclick = function () {
     /* 다시시작 버튼 노출 */
-    pauseBtn.style.display = "none";
-    mixBtn.style.display = "none";
-    restartBtn.style.display = "inline"
+    btnArray = [0, 1, 0, 1, 0];
+    showBtn(btnArray);
     /* 타이머 중지, 모든 게임 동작이 중지 */
-    cards.style.display = "none";
+    cards.style.visibility = "hidden";
     clearInterval(intervalTime);
   };
 
   restartBtn.onclick = function () {
-    pauseBtn.style.display = "inline";
-    restartBtn.style.display = "none"
+    btnArray = [0, 1, 1, 0, 1];
+    showBtn(btnArray);
     /* 타이머가 재동작하며, 게임을 다시 시작할 수 있다. */
-    cards.style.display = "block";
+    cards.style.visibility = "visible";
     intervalTime = setInterval(changeTime, 1000);
   };
 
@@ -349,7 +358,8 @@ document.addEventListener("DOMContentLoaded", function () {
     score.textContent = Number(score.textContent) - 5;
     shuffle(basicArray);
     /* 재배치된 카드를 3초간 보여준 후 다시 뒤집는다. */
-
+    mixImage();
+    startCount();
     /* 일시정지 중에는 실행될 수 없다. */
     /* card[basicArray[i]]에 있는 innerHTML을 빈 문자열에 집어넣은 뒤 그 값을 한 번에 모아서 출력하기. */
   };
