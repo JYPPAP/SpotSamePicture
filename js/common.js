@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   // 버튼관련 변수
-  var buttons = document.getElementById("btn_wrap");
+  var doc = document;
+  var buttons = doc.getElementById("btn_wrap");
   var button = buttons.children;
   var startBtn = button[0];
   var stopBtn = button[1];
@@ -9,16 +10,20 @@ document.addEventListener("DOMContentLoaded", function () {
   var restartBtn = button[3];
   var mixBtn = button[4];
 
-  var playInfo = document.getElementById("playInfo");
-  var playTime = document.getElementById("playTime");
+  var score = doc.getElementById("score");
+  var playCount = doc.getElementById("playCount");
+  var playTimeWrap = doc.getElementsByClassName("playTimeWrap");
+  var playTime = doc.getElementById("playTime");
 
   // 카드관련 변수
-  var cards = document.getElementById("cards");
+  var cards = doc.getElementById("cards");
   var card = cards.getElementsByClassName("card");
+  var frontFace = cards.getElementsByClassName("face_front");
   var backFace = cards.getElementsByClassName("face_back");
+  var playInfo = doc.getElementById("playInfo");
+  // 점수관련 변수
 
-  // 점수관련 변수    
-  var board = document.getElementById("scoreBoard");
+  var scoreBoard = doc.getElementById("scoreBoard");
 
   /*##################
       LocalStorage    
@@ -39,32 +44,35 @@ document.addEventListener("DOMContentLoaded", function () {
     - 저장된 로그 초기화
   2. 로그 옆에 x버튼 생성 후 클릭시 해당 로그 삭제.
   */
-
-  var score = localStorage.getItem("score");
-  // console.log(score);
-  if (0 < score.length) {
-    // console.log("score has value");
-    var splitScore = score.split(/\,/g);
-    if ((splitScore.length % 3) === 0) {
-      var total = splitScore.length / 3;
-      var scoreText = "";
-      for (var i = 0; i < total; i++) {
-        scoreText += "<tr><th>" + splitScore[(i * 3)] + "</th><th>" + splitScore[(i * 3) + 1] + "</th><th>" + splitScore[(i * 3) + 2] + "</th></tr>"
+  // localStorage.clear();
+  function setScoreBoard() {
+    var scoreItem = localStorage.getItem("score");
+    var basicScore = "<tr><th>이름</th><th>Score</th><th>소요시간</th></tr>"
+    console.log(scoreItem);
+    if (typeof (scoreItem) === "string") {
+      // console.log("score has value");
+      var splitScore = scoreItem.split(/\,/g);
+      if ((splitScore.length % 3) === 0) {
+        var total = splitScore.length / 3;
+        var scoreText = "";
+        for (var i = 0; i < total; i++) {
+          scoreText += "<tr><td>" + splitScore[(i * 3)] + "</td><td>" + splitScore[(i * 3) + 1] + "</td><td>" + splitScore[(i * 3) + 2] + "</td></tr>"
+        }
+        scoreBoard.innerHTML = basicScore + scoreText;
+      } else {
+        console.log("가져온 값에 오류가 있습니다.");
       }
-      board.innerHTML += scoreText;
     } else {
-      alert("가져온 값에 오류가 있습니다.");
+      console.log("저장된 score가 없음.");
     }
-  } else {
-    console.log("저장된 score가 없음.");
-  }
+  };
+
+  setScoreBoard();
 
   /* 0-15까지 중복없이 랜덤한 숫자가 들어있는 배열 */
   var basicArray = [];
 
   for (var i = 0; i < 16; i++) basicArray[i] = i;
-
-  /* 배열을 섞어주는 함수. 다시섞기 부분에서 재사용하면 될 것 같음. */
 
   function shuffle(array) {
     for (var index = array.length - 1; index > 0; index--) {
@@ -76,157 +84,154 @@ document.addEventListener("DOMContentLoaded", function () {
       array[randomPosition] = temporary;
     }
   }
-  /*##################
-      텍스트 함수
-  ##################*/
-  /* 현재 변경방법 : innerHTML을 사용해서 내부에 문자열 형태의 값을 입력하는 방식 > 가져와서 만들고 다시 새롭게 만드는 방법을 이용해서 제작.
-  이거보다 더 간단명료하고 명확한 방식에 대해서 찾아보기.
-  HTML에 태그로 존재하고, JSON으로 가져온 값은 css에서 배경이미지로 넣어주기. 값을 입력할 때 클래스값으로 추가적으로 저장하기
-  배열할 때도 클래스가 적용된 태그를 통째로 움직이기.
-  CSS를 적용할 때 for문을 이용해서 집어넣기?
-   */
-  /*##################
-      랜덤 배치
-  ##################*/
+
+  /* 랜덤 배치 */
   function mixImage() {
+    /* 
+    다시 섞기를 했을 때, 일치한 카드에 대해서 어떻게 처리할 것인지 관련된 내용을 추가해야 함.
+    - 배열을 생성하고, 일치할 경우 배열에서 제거하고 그 배열을 셔플해서 이미지를 믹스 후 보여주는 방향?
+    - 일치한 카드를 확인하는 방법은 뭐가 있을까?
+    - 
+     */
     shuffle(basicArray);
     console.log("basicArray");
     console.log(basicArray);
     for (var i = 0; i < basicArray.length; i++) {
       backFace[basicArray[i]].style.backgroundImage = "url(../images/0" + ((i % 8) + 1) + ".jpg)";
     }
+    /* 이대로 했을 경우 일치한 이미지와 섞어야 할 이미지가 섞이는 문제가 발생한다. */
     showImage();
   }
 
   function showImage() {
-    /* 다시섞기를 했을 때 clear 된 것들은 이미지를 삭제하기? */
+    /* 이 부분에서도 이미지를 어떻게 처리할 것인지.
+
+     */
+    /* 
+    섞고난 다음 clear가 없는 카드의 배열?을 저장해서 출력?
+     */
     for (var i = 0; i < card.length; i++) {
-      card[i].className = "card active";
+      frontFace[i].className = "face face_front active";
     }
-    var timerCount = 3
-    /* 여기에 시작했을 때 출력해줄 카운트 추가하기. */
-    setTimeout( function() {
+    setTimeout(function () {
       for (var i = 0; i < card.length; i++) {
-        card[i].className = "card";
+        frontFace[i].className = "face face_front";
       }
-      console.log("Work Here?");
     }, 3000);
-
-  }
-  var clickFlag = false;
-  var prevImage;
-  var checkFlag = false;
-
-  function clickCheck() {
-    if(clickFlag){
-      return clickFlag;
-    } else {
-      clickFlag = true;
-      return false;
+    for (var i = 3; i < 0; i--) {
+      setTimeout(function () {
+        playCount.textContent = i;
+      }, i * 1000);
     }
+
   }
-  
+  var clickCount = 0;
+  var prevImage = "";
+  var checkFlag = false;
+  var gameCount = 0;
+
   cards.addEventListener("click", function (e) {
-    /*
-    * 중복클릭을 방지할 만한 내용 추가하기.
-      - 하나를 클릭하고 두 번째 카드를 선택했을 때 잠깐의 딜레이를 추가해서 클릭을 막는 방법.
-      - 어떻게?
-      일단 카드를 클릭했을 때 처음 카드는 무조건 선택이 되어야 함.
-      두 번째 카드를 선택했을 때 지연을 추가해야 함.
-      카드가 달랐을 때 이벤트가 끝날 때까지 클릭 방지.
-    
-    1. 클릭한 요소를 확인
-      - 클릭한 요소가 front 인지 확인 front면 다음으로, 그렇지 않으면 아무것도 하지 않기.
-    2. 클릭한 요소를 기준으로 다음 요소인 이미지를 확인
-    3. 이미지를 확인 후 active 클래스 부여.
-    4. 현재 클릭한 요소가 두 번째 클릭한 요소인지 확인.
-      - 첫 번째 클릭인 경우 현재 클릭한 요소를 prevImage? 첫 번째 클릭한 요소인 것을 확인할 수 있는 방법을 이용하여 저장. 두 번째 클릭인 경우 확인
-    5. 두 번째 클릭 확인의 경우 이전에 클릭한 요소와 비교
-      - match로 숫자 뽑은 것을 비교하여, 문제를 해결해야 함.
-
-    */
-
-    // console.log("this");
-    // console.log(this);
-    // console.log("");
-    var clickFlag = false;
     var target = e.target;
     var targetImage = target.nextElementSibling;
-    var targetCard = target.parentNode;
 
+    if (clickCount === 2) return;
 
-    if (targetCard.className !== "card clear") {
-      targetCard.className += " active";
+    if (target.className === "face face_front") {
+      target.className = "face face_front active";
+    } else {
+      return;
     }
 
     var targetNumber = targetImage.style.backgroundImage;
-    // var targetNumber = targetImage.style.backgroundImage.match(/\d{2}/g);
-    // console.log("∇은 내가 찾아야 할 값.");
-    // console.log("########################");
-    // if(clickCheck()){return;}
-    if (checkFlag) {
-      checkFlag = false;
+    if (clickCount === 1) {
+      // console.log("두 번째 클릭일 때 실행될 코드");
       var prevNumber = prevImage.style.backgroundImage;
-      // var prevNumber = prevImage.style.backgroundImage.match(/\d{2}/g);
-      /* 비교대상을 이걸로 할 필요는 없어보임. 그냥 backgroundImage의 링크를 가지고 비교하는게 더 좋아보임. 그러면 배열형태도 아니기 때문에 [0] === [0] 을 비교할 필요도 없음. */
-      console.log("두 번째 클릭일 때 실행될 코드");
-      if (targetNumber[0] === prevNumber[0]) {
-        console.log("두 이미지가 일치할 때  실행될 코드");
-        /*
-        1. 스코어의 점수를 올리기
-        2. 다시섞기를 위해서 어떤 배열을 준비하기?
-          - 다시 섞을 때, 통과한 숫자는 다시 보여져야 하기 때문에 어떻게 만들지에 대해서 조금 더 생각해보기.
-          - 짝이 맞았을 때 특정 클래스 또는 확인할 수 있는 값을 card에 부여해서 특정 클래스가 부여된 카드는 섞더라도 앞을 보여줄 수 있도록 만들기.
-          예를들어 clear 클래스를 부여해서 clear 클래스가 부여되어 있다면, 앞을 보여줄 수 있도록 만들기.
-          
-          이미지 전체를 섞지만 clear 클래스가 부여되어 있다면 뒷면이 보일 수 있도록 만들고 싶긴 한데 어떻게 만들지?
-          동일하다는 것을 확인 후 클릭금지를 풀어줘야 할 것 같음. 중복입력으로 인한 버그가 존재함.
+      clickCount = 2;
 
-        */
+      if (targetNumber === prevNumber) {
+        // console.log("두 이미지가 일치할 때  실행될 코드");
+        score.textContent = Number(score.textContent) + 10;
+        /*
+         * 카드를 다시 섞더라도 card[shuffleArray[i]]의 카드 내부에 있는 innerHTML을 복사 후 빈 문자열에 집어넣고, 그 문자열을 card의 innerHTML에 저장하는 방법으로 제작 후 showCard? 하게 된다면 좋을 것 같다. showCard 부분에서 만약 className이 face face_front clear 일 경우 패스하고, 그 외의 경우 face face_front의 상태로 만들면 좋을 것 같다.
+         * 아예 작성하는 부분을 함수로 제작하는것도 나쁘진 않을 것 같다. 시작할 때 랜덤배열을 만들고 그 배열을 이용해서 배치하고 다시 섞을 때도 랜덤배열을 만들고 그 배열을 이용해서 배치만 하는
+         * * 배치를 목적으로 하는 함수를 제작하는것도 좋을 것 같다.
+         */
         setTimeout(function () {
-          targetCard.className = "card clear";
-          prevImage.parentNode.className = "card clear";
+          target.className = "face face_front clear";
+          prevImage.previousElementSibling.className = "face face_front clear";
+          clickCount = 0;
         }, 500);
+        gameCount++;
       } else {
-        console.log("두 이미지가 다를 때  실행될 코드");
-        if(clickCheck()){return;}
+        // console.log("두 이미지가 다를 때  실행될 코드");
+        score.textContent = Number(score.textContent) - 5;
         setTimeout(function () {
-          targetCard.className = "card";
-          prevImage.parentNode.className = "card";
+          for (var i = 0; i < frontFace.length; i++) {
+            frontFace[i].className = frontFace[i].className !== "face face_front clear" ? "face face_front" : "face face_front clear";
+          }
+          clickCount = 0;
         }, 1000);
+
         /* 이미지 한 개를 누른 뒤 다시 섞기를 눌렀을 경우 어떻게 할 것인지?
-          
-        일단 card clear를 className으로 가지지 않은 요소들에 대해서 작업을 진행하는 것도 괜찮을 것 같은데.
-        위치를 섞는게 문제긴 한데... 섞는 것을 어떻게 처리하는지가 관건..
-        점수를 -5점 할 수 있는 내용 추가하기.
+        전부 섞지만 clear 클래스가 붙어있다면 active 클래스도 추가되지 않을것.
+        다만 다시 섞을 때 active 클래스가 적용된 것이 있다면 active 클래스를 제거해야 할 것.
          */
       }
-      return clickFlag, checkFlag;
+      if (gameCount === 8) {
+        console.log("Game End !!!!");
+        gameEnd();
+      }
+      return clickCount, checkFlag, gameCount;
     } else {
-      /* 첫 번째 실행 또는 그 외의 경우 실행할 코드 */
-      console.log("첫 번째 클릭일 때 실행될 코드");
-      checkFlag = true;
+      // console.log("첫 번째 클릭일 때 실행될 코드");
+      clickCount = 1;
       prevImage = targetImage;
       /* 두 번째 클릭에서 기존 prev를 가지고 있어도 첫 번째 클릭으로 새로운 값이 덮어써지기 때문에 문제는 없다. */
-      return clickFlag, checkFlag, prevImage;
+      console.log(card[0].innerHTML);
+      return clickCount, prevImage;
     }
   });
 
-  /* (END) 카드를 클릭했을 때 할 동작 */
+  function gameEnd() {
+    var endName = prompt("게임이 종료되었습니다.\n이름을 입력해주세요", "(콤마 , )제외");
+    playTime.textContent = 40;
+    score.textContent = 120;
+    var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "초";
+    var endTime = playTime.textContent + "점";
+    console.log(typeof (endName));
 
+    // var parseName = (/[\w|ㄱ-ㅎ|가-힣|][^\,]/g).test(endName);
+    if (endName === "" || endName === null) {
+      endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.", "(콤마 , )제외");
+      if (endName === "" || endName === null) {
+        return;
+      }
+    }
+    var tempItem = localStorage.getItem("score");
+    var parseName = endName.replace(/[\,]/g, "");
+    var endString = parseName + "," + endScore + "," + endTime;
+    var setString = "";
 
-  /* 카드 뒤집기 */
-  function turnCard() {
-    // this.className = "card active";
-    // if(checkFlag) {
-    //   if(prevImage === this.className) {
-    //     prevImage.className = "card open";
-    //     this.className = "card open";
-    //   }
-    // }
-    // checkFlag = true
-    // var prevImage = this.className;
+    if (tempItem === null) {
+      setString = endString;
+    } else {
+      setString = endString + "," + tempItem;
+    }
+    localStorage.clear();
+    localStorage.setItem("score", setString);
+    scoreBoard.innerHTML = "";
+    setScoreBoard();
+
   }
+  // gameEnd();
+
+  /* (END) 카드를 클릭했을 때 할 동작 */
+  /* 카드게임이 끝난것을 어떻게 확인할 것인지
+  일치할 때 gameCount를 1씩 추가.
+  16이 되면 prompt 실행.
+  이름을 가져오고 score와 시간을 점수로 합산 후 score로, 시간은 따로 시간으로 저장?
+   */
+
   /*##################
       button Click
   ##################*/
@@ -242,8 +247,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     startBtn.style.display = "none";
     restartBtn.style.display = "none";
-    // console.log("playInfo.textContent");
-    // console.log(playInfo.textContent);
 
     /*##########
         AJAX
@@ -263,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (xhr.status === 200) {
         var parseValue = JSON.parse(xhr.responseText);
-        playTime.textContent = "제한시간 : " + parseValue.time + " 초";
+        playTime.textContent = parseValue.time;
         console.log(parseValue.images);
         for (var i = 0; i < parseValue.images.length * 2; i++) {
           backFace[i].style.backgroundImage = "url(../" + parseValue.images[(i % 8)] + ")";
@@ -286,49 +289,67 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   function showCount() {
+    var timeCount = 3;
+    playCount.textContent = timeCount;
 
+    for (var i = 0; i < 3; i++) {
+      var timeCount = 3;
+      setTimeout(function () {
+        playCount.textContent = timeCount;
+        timeCount--;
+        if (timeCount === 0) startCount();
+      }, (i * 1000));
+    }
   }
-  // function initPlay() {
-  //   for (var i = 0; i < card.length; i++) {
-  //     card[i].className = "card";
-  //     card[i].style.display = "block";
-  //   }
-  // }
+  var intervalTime = setInterval(changeTime, 1000);
 
+  function startCount() {
+    console.log("Count START !!!!!");
+    playCount.style.display = "none";
+    playTimeWrap[0].style.display = "block";
+
+    intervalTime = setInterval(changeTime, 1000);
+  }
+
+  function changeTime() {
+    var time = playTime.textContent;
+
+    playTime.textContent = time;
+    time--;
+  }
   stopBtn.onclick = function () {
     /* 게임을 종료하고 초기화면으로 돌아가기. */
-    initPlay();
+    for (var i = 0; i < buttons.length; i++) {
+      button[i].style.display = "none";
+    }
+    startBtn.style.display = "inline";
   };
 
   pauseBtn.onclick = function () {
+    /* 다시시작 버튼 노출 */
     pauseBtn.style.display = "none";
+    mixBtn.style.display = "none";
     restartBtn.style.display = "inline"
     /* 타이머 중지, 모든 게임 동작이 중지 */
-    /* 다시시작 버튼 노출 */
+    cards.style.display = "none";
+    clearInterval(intervalTime);
   };
 
   restartBtn.onclick = function () {
+    pauseBtn.style.display = "inline";
+    restartBtn.style.display = "none"
     /* 타이머가 재동작하며, 게임을 다시 시작할 수 있다. */
+    cards.style.display = "block";
+    intervalTime = setInterval(changeTime, 1000);
   };
 
   mixBtn.onclick = function () {
     /* Score에서 -5점 차감, 이미 찾은 카드를 제외한 나머지 카드들을 재배치 */
+    score.textContent = Number(score.textContent) - 5;
+    shuffle(basicArray);
     /* 재배치된 카드를 3초간 보여준 후 다시 뒤집는다. */
+
     /* 일시정지 중에는 실행될 수 없다. */
+    /* card[basicArray[i]]에 있는 innerHTML을 빈 문자열에 집어넣은 뒤 그 값을 한 번에 모아서 출력하기. */
   };
-  cards.onclick = cardClick();
-
-  /* 카드를 클릭했을 때 어떤 동작을 하도록 할 것인지 구현하기 */
-  /* 
-  1. 뒤집기
-  2. 클릭한 요소의 인덱스 가져오기
-  3. 그 다음 클릭한 요소의 인덱스 가져오기
-  값이 2개가 되었으면 두 인덱스에서 동일한 카드임을 확인할 수 있는 방법을 찾아서 확인하기.
-  */
-  function cardClick() {
-    // console.log("Hi");
-    // this.className = "card active";
-  }
-
-
 });

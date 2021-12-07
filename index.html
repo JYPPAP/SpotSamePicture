@@ -21,8 +21,12 @@
         <button>다시시작</button>
         <button>다시섞기</button>
       </div>
-      <p id="dashBoard">Score : 0</p>
-      <p id="playTime">준비</p>
+      <div class="board">
+        <p class="scoreWrap">Score : <span id="score">0</span>
+        </p>
+        <p id="playCount">준비</p>
+        <p class="playTimeWrap">제한시간 : <span id="playTime"></span>초</p>
+      </div>
       <div class="play_wrap">
         <div id="cards">
           <div class="card">
@@ -91,13 +95,7 @@
           </div>
           <p id="playInfo">게임을 시작하려면 시작하기 버튼을 눌러주세요.</p>
         </div>
-        <table id="scoreBoard">
-          <tr>
-            <th>이름</th>
-            <th>Score</th>
-            <th>소요시간</th>
-          </tr>
-        </table>
+        <table id="scoreBoard"></table>
       </div>
     </div>
   </div>
