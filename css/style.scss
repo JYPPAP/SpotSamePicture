@@ -129,15 +129,13 @@ p {
     .face_front {
       transform: rotateY(0deg);
       user-select: none;
-      width: 50%;
-      height: 50%;
+
     }
 
     .face_back {
-      // background-image: url(../images/01.jpg);
       overflow: hidden;
       background: no-repeat center;
-      transform: rotateY(-70deg);
+      transform: rotateY(-180deg);
     }
 
     .face_front.active {

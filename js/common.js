@@ -194,8 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function gameEnd() {
     var endName = prompt("게임이 종료되었습니다.\n이름을 입력해주세요", "(콤마 , )제외");
-    playTime.textContent = 40;
-    score.textContent = 120;
+    // playTime.textContent = 40;
+    // score.textContent = 120;
     var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "초";
     var endTime = playTime.textContent + "점";
     console.log(typeof (endName));
