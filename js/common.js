@@ -112,12 +112,13 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     for (var i = 0; i < card.length; i++) {
       frontFace[i].className = "face face_front active";
+      setTimeout(function () {
+        for (var i = 0; i < card.length; i++) {
+          frontFace[i].className = "face face_front";
+        }
+      }, 3000);
     }
-    setTimeout(function () {
-      for (var i = 0; i < card.length; i++) {
-        frontFace[i].className = "face face_front";
-      }
-    }, 3000);
+
     for (var i = 3; i < 0; i--) {
       setTimeout(function () {
         playCount.textContent = i;
@@ -129,6 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var prevImage = "";
   var checkFlag = false;
   var gameCount = 0;
+
 
   cards.addEventListener("click", function (e) {
     var target = e.target;
@@ -292,12 +294,12 @@ document.addEventListener("DOMContentLoaded", function () {
     var timeCount = 3;
     playCount.textContent = timeCount;
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 4; i++) {
       var timeCount = 3;
       setTimeout(function () {
         playCount.textContent = timeCount;
         timeCount--;
-        if (timeCount === 0) startCount();
+        if (timeCount < 0) startCount();
       }, (i * 1000));
     }
   }
@@ -308,12 +310,11 @@ document.addEventListener("DOMContentLoaded", function () {
     playCount.style.display = "none";
     playTimeWrap[0].style.display = "block";
 
-    intervalTime = setInterval(changeTime, 1000);
+    intervalTime = setInterval(changeTime(), 1000);
   }
 
   function changeTime() {
-    var time = playTime.textContent;
-
+    var time = Number(playTime.textContent);
     playTime.textContent = time;
     time--;
   }
