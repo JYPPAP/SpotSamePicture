@@ -224,9 +224,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // score.textContent = 120;
     var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "점";
     var endTime = playTime.textContent + "초";
-    console.log(typeof (endName));
 
-    // var parseName = (/[\w|ㄱ-ㅎ|가-힣|][^\,]/g).test(endName);
+    playCount.style.display = "block";
+    playTime.style.display = "none";
+    playCount.textContent = "총 Score 는 " + endScore + "(" + score.textContent + "+" + playTime.textContent + ") 입니다.";
+
     if (endName === "" || endName === null) {
       endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.\n(콤마 , )제외", "");
       if (endName === "" || endName === null) {
