@@ -9,6 +9,7 @@
   width: 1200px;
   height: 900px;
   margin: 10px auto;
+
 }
 
 /* 위치 */
@@ -75,10 +76,6 @@ p {
     content: '';
   }
 
-  >* {
-    display: none;
-  }
-
   #playInfo {
     display: block;
     font-size: 20px;
@@ -88,6 +85,7 @@ p {
 
   .card {
     position: relative;
+    display: none;
     float: left;
     width: 25%;
     height: 25%;
@@ -120,7 +118,7 @@ p {
       line-height: 200px;
       text-align: center;
       /* 테스트 종료 후 .5초나 .3초로 증가시키기. */
-      transition: 0.1s;
+      transition: 0.3s;
       backface-visibility: hidden;
     }
 
@@ -128,12 +126,21 @@ p {
     .face_front {
       transform: rotateY(0deg);
       user-select: none;
+
     }
 
     .face_back {
       overflow: hidden;
       background: no-repeat center;
       transform: rotateY(-180deg);
+    }
+
+    &.active .face_front {
+      transform: rotateY(180deg);
+    }
+
+    &.active .face_back {
+      transform: rotateY(0deg);
     }
 
     .face_front.active {

@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var scoreBoard = doc.getElementById("scoreBoard");
 
   /*##################
-      LocalStorage    
+      LocalStorage
   ##################*/
   // localStorage.clear();
   function setScoreBoard() {
@@ -35,15 +35,17 @@ document.addEventListener("DOMContentLoaded", function () {
     var scoreHeader = "<tr><th>이름</th><th>Score</th><th>소요시간</th></tr>"
     console.log(scoreItem);
     if (typeof (scoreItem) === "string") {
-      // console.log("score has value");
       var splitScore = scoreItem.split(/\,/g);
+
       if ((splitScore.length % 3) === 0) {
         var total = splitScore.length / 3;
         var scoreText = "";
+
         for (var i = 0; i < total; i++) {
           scoreText += "<tr><td>" + splitScore[(i * 3)] + "</td><td>" + splitScore[(i * 3) + 1] + "</td><td>" + splitScore[(i * 3) + 2] + "</td></tr>"
         }
         scoreBoard.innerHTML = scoreHeader + scoreText;
+
       } else {
         console.log("가져온 값에 오류가 있습니다.");
       }
@@ -52,13 +54,54 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("저장된 score가 없음.");
     }
   };
-
   setScoreBoard();
 
-  /* 0-15까지 중복없이 랜덤한 숫자가 들어있는 배열 */
-  var basicArray = [];
+  startBtn.onclick = function () {
+    /* 버튼 숨기고 보여주기 */
+    btnArray = [0, 1, 1, 0, 1];
+    showBtn(btnArray);
+    for (var i = 0; i < card.length; i++) {
+      card[i].style.display = "block";
+    }
+    playInfo.style.display = "none";
 
-  for (var i = 0; i < 16; i++) basicArray[i] = i;
+    /*##########
+        AJAX
+    ##########*/
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('GET', 'json/setPlay.json');
+    xhr.send();
+
+    xhr.onreadystatechange = function () {
+      console.log("[" + xhr.status + "] : " + xhr.statusText);
+      // 서버 응답 완료 && 정상 응답
+      if (xhr.readyState !== XMLHttpRequest.DONE) return;
+
+      if (xhr.status === 200) {
+        parseValue = JSON.parse(xhr.responseText);
+        playTime.textContent = parseValue.time; {
+          /* parseValue를 반환해서 사용하기. */
+          // console.log(parseValue.images);
+          // for (var i = 0; i < parseValue.images.length * 2; i++) {
+          //   backFace[i].style.backgroundImage = "url(../" + parseValue.images[(i % 8)] + ")";
+          // }
+          // console.log("Work1");
+        }
+        setImage();
+        mixImage();
+        showCount();
+        return parseValue;
+      } else {
+        console.log("[" + xhr.status + "] : " + xhr.statusText);
+      }
+    }
+  };
+
+  /* 0-15까지 중복없이 랜덤한 숫자가 들어있는 배열 */
+  var mixArray = [];
+
+  for (var i = 0; i < 16; i++) mixArray[i] = i;
 
   function shuffle(array) {
     for (var index = array.length - 1; index > 0; index--) {
@@ -71,34 +114,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function setImage() {
+    /* 이 부분은 ajax로 옮기기? */
+    var imageUrl = parseValue.images;
+    var setFrame = "";
+    for (var i = 0; i < imageUrl.length * 2; i++) {
+      setFrame += '<div class="card">\n<div class="face face_front">?</div>\n<div class="face face_back" style="background-image: url(' + imageUrl[(i % 8)] + ')"></div>\n</div>\n';
+    }
+    console.log(setFrame);
+    cards.innerHTML = setFrame;
+  }
+
   /* 랜덤 배치 */
   function mixImage() {
-    /* 
-    다시 섞기를 했을 때, 일치한 카드에 대해서 어떻게 처리할 것인지 관련된 내용을 추가해야 함.
-    - 배열을 생성하고, 일치할 경우 배열에서 제거하고 그 배열을 셔플해서 이미지를 믹스 후 보여주는 방향?
-    - 일치한 카드를 확인하는 방법은 뭐가 있을까?
-    - 
-     */
-    shuffle(basicArray);
-    console.log("basicArray");
-    console.log(basicArray);
-    var mixCardText = "";
-    for (var i = 0; i < card.length; i++) {
-      mixCardText += card[basicArray[i]].innerHTML;
-      // backFace[basicArray[i]].style.backgroundImage = "url(/images/0" + ((i % 8) + 1) + ".jpg)";
+    array = shuffle(mixArray);
+    var mixCard = "";
+    for (var i = 0; i < array.length; i++) {
+      mixCard += card[array[i]].innerHTML;
     }
-    console.log(mixCardText);
-    cards.innerHTML = mixCardText;
-    /* 이대로 했을 경우 일치한 이미지와 섞어야 할 이미지가 섞이는 문제가 발생한다. */
+    // console.log("######################");
+    // console.log("######################");
+    // console.log("mixCard");
+    // console.log(mixCard);
     showImage();
   }
 
   function showImage() {
+
     for (var i = 0; i < card.length; i++) {
-      frontFace[i].className = "face face_front active";
+      card[i].className = "card active";
+      console.log(card[i].className);
       setTimeout(function () {
         for (var i = 0; i < card.length; i++) {
-          frontFace[i].className = "face face_front";
+          card[i].className = "card";
         }
       }, 3000);
     }
@@ -110,16 +158,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
   }
-  var clickCount = 0;
-  var prevImage = "";
-  var checkFlag = false;
-  var gameCount = 0;
-
 
   cards.addEventListener("click", function (e) {
+    var clickCount;
+    var prevImage;
+    var checkFlag;
+    var gameCount;
     var target = e.target;
     var targetImage = target.nextElementSibling;
 
+    /* 이미지 3장 이상 클릭 방지 */
     if (clickCount === 2) return;
 
     if (target.className === "face face_front") {
@@ -127,21 +175,16 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       return;
     }
+    if (!isNaN(gameCount)) gameCount = 0;
 
     var targetNumber = targetImage.style.backgroundImage;
     if (clickCount === 1) {
-      // console.log("두 번째 클릭일 때 실행될 코드");
       var prevNumber = prevImage.style.backgroundImage;
       clickCount = 2;
 
       if (targetNumber === prevNumber) {
-        // console.log("두 이미지가 일치할 때  실행될 코드");
         score.textContent = Number(score.textContent) + 10;
-        /*
-         * 카드를 다시 섞더라도 card[shuffleArray[i]]의 카드 내부에 있는 innerHTML을 복사 후 빈 문자열에 집어넣고, 그 문자열을 card의 innerHTML에 저장하는 방법으로 제작 후 showCard? 하게 된다면 좋을 것 같다. showCard 부분에서 만약 className이 face face_front clear 일 경우 패스하고, 그 외의 경우 face face_front의 상태로 만들면 좋을 것 같다.
-         * 아예 작성하는 부분을 함수로 제작하는것도 나쁘진 않을 것 같다. 시작할 때 랜덤배열을 만들고 그 배열을 이용해서 배치하고 다시 섞을 때도 랜덤배열을 만들고 그 배열을 이용해서 배치만 하는
-         * * 배치를 목적으로 하는 함수를 제작하는것도 좋을 것 같다.
-         */
+
         setTimeout(function () {
           target.className = "face face_front clear";
           prevImage.previousElementSibling.className = "face face_front clear";
@@ -158,12 +201,9 @@ document.addEventListener("DOMContentLoaded", function () {
           clickCount = 0;
         }, 1000);
 
-        /* 이미지 한 개를 누른 뒤 다시 섞기를 눌렀을 경우 어떻게 할 것인지?
-        전부 섞지만 clear 클래스가 붙어있다면 active 클래스도 추가되지 않을것.
-        다만 다시 섞을 때 active 클래스가 적용된 것이 있다면 active 클래스를 제거해야 할 것.
-         */
       }
       if (gameCount === 8) {
+        gameCount = 0;
         console.log("Game End !!!!");
         gameEnd();
       }
@@ -179,19 +219,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function gameEnd() {
-    clearInterval(intervalTime);
     var endName = prompt("게임이 종료되었습니다.\n이름을 입력해주세요\n(콤마 , )제외", "");
+    // playTime.textContent = 40;
+    // score.textContent = 120;
     var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "점";
-    /* 여기에 전체 시간 - 남은 시간으로 소요시간을 작성해야 함. */
-    var endTime = (Number(parseValue.time) - Number(playTime.textContent)) + "초";
+    var endTime = playTime.textContent + "초";
     console.log(typeof (endName));
 
-    playCount.style.display = "block";
-    playTime.style.display = "none";
-    playCount.textContent = "총 Score 는 " + endScore + "(" + score.textContent + "+" + playTime.textContent + ") 입니다.";
-
+    // var parseName = (/[\w|ㄱ-ㅎ|가-힣|][^\,]/g).test(endName);
     if (endName === "" || endName === null) {
-      endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.", "");
+      endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.\n(콤마 , )제외", "");
       if (endName === "" || endName === null) {
         return;
       }
@@ -210,12 +247,9 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("score", setString);
     scoreBoard.innerHTML = "";
     setScoreBoard();
-    /* 게임이 종료되었을 때 버튼 지정에 대해서 고민해보기. */
-  }
-  // gameEnd();
-  function initPlay() {
 
   }
+  // gameEnd();
 
   /* (END) 카드를 클릭했을 때 할 동작 */
   /* 카드게임이 끝난것을 어떻게 확인할 것인지
@@ -237,53 +271,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  startBtn.onclick = function () {
-    /* 버튼 숨기고 보여주기 */
-    btnArray = [0, 1, 1, 0, 1];
-    showBtn(btnArray);
-    for (var i = 0; i < card.length; i++) {
-      card[i].style.display = "block";
-    }
-    playInfo.style.display = "none";
 
-    /*##########
-        AJAX
-    ##########*/
-    /* 목적 : JSON에서 제한시간과 이미지 배치 */
-    /* 이미지 배치의 경우 초기 정렬만 할 것이며 나중에 랜덤배열을 이용하여 만들 것. */
-    /* 시작하기 버튼을 클릭했을 시점으로 옮겨야 함. */
-    var xhr = new XMLHttpRequest();
-
-    xhr.open('GET', 'json/setPlay.json');
-    xhr.send();
-
-    xhr.onreadystatechange = function () {
-      console.log("[" + xhr.status + "] : " + xhr.statusText);
-      // 서버 응답 완료 && 정상 응답
-      if (xhr.readyState !== XMLHttpRequest.DONE) return;
-
-      if (xhr.status === 200) {
-        parseValue = JSON.parse(xhr.responseText);
-        playTime.textContent = parseValue.time;
-        console.log("parseValue.images");
-        console.log(parseValue.images);
-        for (var i = 0; i < parseValue.images.length * 2; i++) {
-          backFace[i].style.backgroundImage = "url(/" + parseValue.images[(i % 8)] + ")";
-          console.log(backFace[i].style.backgroundImage);
-        }
-        console.log("Work1");
-        mixImage();
-        showCount();
-        return parseValue;
-      } else {
-        console.log("[" + xhr.status + "] : " + xhr.statusText);
-      }
-    }
-
-    /* 시간같은 경우는 setInterval을 이용하고 게임이 종료되었을 때 clearInterval 한 뒤 값을 가져오면 될 것 같음.
-    아니면 시계표시 관련해서 찾아본 뒤 값을 가져오는 방법으로 작성해도 괜찮을 것 같음.
-     */
-  };
 
   function showCount() {
     var timeCount = 3;
@@ -347,13 +335,13 @@ document.addEventListener("DOMContentLoaded", function () {
     showBtn(btnArray);
     /* 타이머가 재동작하며, 게임을 다시 시작할 수 있다. */
     cards.style.visibility = "visible";
-    // intervalTime = setInterval(changeTime, 1000);
-    clearInterval(intervalTime);
+    intervalTime = setInterval(changeTime, 1000);
   };
 
   mixBtn.onclick = function () {
     /* Score에서 -5점 차감, 이미 찾은 카드를 제외한 나머지 카드들을 재배치 */
     score.textContent = Number(score.textContent) - 5;
+    clearInterval(intervalTime);
     shuffle(basicArray);
     /* 재배치된 카드를 3초간 보여준 후 다시 뒤집는다. */
     mixImage();
