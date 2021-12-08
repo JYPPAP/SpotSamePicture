@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     playCount.style.display = "block";
     playTime.style.display = "none";
-    playCount.textContent = "총 Score 는 "+endScore+"("+score.textContent+"+"+playTime.textContent+") 입니다.";
+    playCount.textContent = "총 Score 는 " + endScore + "(" + score.textContent + "+" + playTime.textContent + ") 입니다.";
 
     if (endName === "" || endName === null) {
       endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.", "");
@@ -268,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("parseValue.images");
         console.log(parseValue.images);
         for (var i = 0; i < parseValue.images.length * 2; i++) {
-          backFace[i].style.backgroundImage = "url(../" + parseValue.images[(i % 8)] + ")";
+          backFace[i].style.backgroundImage = "url(/" + parseValue.images[(i % 8)] + ")";
           console.log(backFace[i].style.backgroundImage);
         }
         console.log("Work1");
