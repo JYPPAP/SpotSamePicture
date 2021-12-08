@@ -9,7 +9,6 @@
   width: 1200px;
   height: 900px;
   margin: 10px auto;
-
 }
 
 /* 위치 */
@@ -129,7 +128,6 @@ p {
     .face_front {
       transform: rotateY(0deg);
       user-select: none;
-
     }
 
     .face_back {
@@ -162,12 +160,12 @@ p {
   width: 400px;
   height: 500px;
   padding-left: 20px;
-  overflow: hidden;
+  overflow: hidden scroll;
 
   tr {
     display: block;
-    width: 380px;
-    margin-bottom: 5px;
+    width: 360px;
+    margin: 0 5px 5px 0;
     border: 1px solid #000;
 
     th,
@@ -181,7 +179,7 @@ p {
       border-left: 1px solid #000;
 
       &:first-child {
-        width: 160px;
+        width: 140px;
         border-left: none;
       }
     }

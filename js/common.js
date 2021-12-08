@@ -23,28 +23,12 @@ document.addEventListener("DOMContentLoaded", function () {
   var backFace = cards.getElementsByClassName("face_back");
   var playInfo = doc.getElementById("playInfo");
   // 점수관련 변수
-
+  var parseValue;
   var scoreBoard = doc.getElementById("scoreBoard");
 
   /*##################
       LocalStorage    
   ##################*/
-  /* 
-  1. 기존의 값은 불러오고, 새로운 값이 입력되면, 그 값은 가장 상단에 위치할 수 있도록 기존의 값을 임시배열에 저장하고 새로운 값을 push한 다음 기존의 값을 추가하는 방향.
-  일단 가장 상단에 최근 기록이 등록되면 됨.
-  
-  2. prompt에서 input에 입력할 때 ,가 입력되는것 막아야 함.
-
-  3. 가져온 값이 많을 때를 생각해서 넘치지는 않게, 스크롤을 추가하면 좋을 것 같음.
-    - CSS를 이용해서 양이 늘어난다면 스크롤 될 수 있도록 만들기.
-
-  4. localStorage.setItem("score", 추가될 값(배열 형태로 저장해야 함.));
-    - prompt로 값 입력받을 때 파싱해서 ","가 들어있으면 다시 작성하라고 하기. 가능하다면 alert를 띄워서 특수문자 입력하면 안된다고 퉁쳐도 괜찮을 것 같음. 아니면 영어, 한국어, 숫자만 입력할 수 있도록 확인 후 다시 입력하도록 만드는 것도 나쁘진 않을 것 같음.
-  @ 나중에 추가하고 싶은 기능
-  1. 버튼 중 로그 초기화 버튼 만들기
-    - 저장된 로그 초기화
-  2. 로그 옆에 x버튼 생성 후 클릭시 해당 로그 삭제.
-  */
   // localStorage.clear();
   function setScoreBoard() {
     var scoreItem = localStorage.getItem("score");
@@ -98,9 +82,13 @@ document.addEventListener("DOMContentLoaded", function () {
     shuffle(basicArray);
     console.log("basicArray");
     console.log(basicArray);
-    for (var i = 0; i < basicArray.length; i++) {
-      backFace[basicArray[i]].style.backgroundImage = "url(../images/0" + ((i % 8) + 1) + ".jpg)";
+    var mixCardText = "";
+    for (var i = 0; i < card.length; i++) {
+      mixCardText += card[basicArray[i]].innerHTML;
+      // backFace[basicArray[i]].style.backgroundImage = "url(/images/0" + ((i % 8) + 1) + ".jpg)";
     }
+    console.log(mixCardText);
+    cards.innerHTML = mixCardText;
     /* 이대로 했을 경우 일치한 이미지와 섞어야 할 이미지가 섞이는 문제가 발생한다. */
     showImage();
   }
@@ -191,16 +179,19 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function gameEnd() {
-    var endName = prompt("게임이 종료되었습니다.\n이름을 입력해주세요", "(콤마 , )제외");
-    // playTime.textContent = 40;
-    // score.textContent = 120;
+    clearInterval(intervalTime);
+    var endName = prompt("게임이 종료되었습니다.\n이름을 입력해주세요\n(콤마 , )제외", "");
     var endScore = (Number(score.textContent) + Number(playTime.textContent)) + "점";
-    var endTime = playTime.textContent + "초";
+    /* 여기에 전체 시간 - 남은 시간으로 소요시간을 작성해야 함. */
+    var endTime = (Number(parseValue.time) - Number(playTime.textContent)) + "초";
     console.log(typeof (endName));
 
-    // var parseName = (/[\w|ㄱ-ㅎ|가-힣|][^\,]/g).test(endName);
+    playCount.style.display = "block";
+    playTime.style.display = "none";
+    playCount.textContent = "총 Score 는 "+endScore+"("+score.textContent+"+"+playTime.textContent+") 입니다.";
+
     if (endName === "" || endName === null) {
-      endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.", "(콤마 , )제외");
+      endName = prompt("이름을 입력하지 않았습니다.\n이름을 입력해주시기 바랍니다.", "");
       if (endName === "" || endName === null) {
         return;
       }
@@ -219,9 +210,12 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("score", setString);
     scoreBoard.innerHTML = "";
     setScoreBoard();
-
+    /* 게임이 종료되었을 때 버튼 지정에 대해서 고민해보기. */
   }
   // gameEnd();
+  function initPlay() {
+
+  }
 
   /* (END) 카드를 클릭했을 때 할 동작 */
   /* 카드게임이 끝난것을 어떻게 확인할 것인지
@@ -269,15 +263,18 @@ document.addEventListener("DOMContentLoaded", function () {
       if (xhr.readyState !== XMLHttpRequest.DONE) return;
 
       if (xhr.status === 200) {
-        var parseValue = JSON.parse(xhr.responseText);
+        parseValue = JSON.parse(xhr.responseText);
         playTime.textContent = parseValue.time;
+        console.log("parseValue.images");
         console.log(parseValue.images);
         for (var i = 0; i < parseValue.images.length * 2; i++) {
           backFace[i].style.backgroundImage = "url(../" + parseValue.images[(i % 8)] + ")";
+          console.log(backFace[i].style.backgroundImage);
         }
         console.log("Work1");
         mixImage();
         showCount();
+        return parseValue;
       } else {
         console.log("[" + xhr.status + "] : " + xhr.statusText);
       }
@@ -350,7 +347,8 @@ document.addEventListener("DOMContentLoaded", function () {
     showBtn(btnArray);
     /* 타이머가 재동작하며, 게임을 다시 시작할 수 있다. */
     cards.style.visibility = "visible";
-    intervalTime = setInterval(changeTime, 1000);
+    // intervalTime = setInterval(changeTime, 1000);
+    clearInterval(intervalTime);
   };
 
   mixBtn.onclick = function () {
@@ -359,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
     shuffle(basicArray);
     /* 재배치된 카드를 3초간 보여준 후 다시 뒤집는다. */
     mixImage();
-    startCount();
+    showCount();
     /* 일시정지 중에는 실행될 수 없다. */
     /* card[basicArray[i]]에 있는 innerHTML을 빈 문자열에 집어넣은 뒤 그 값을 한 번에 모아서 출력하기. */
   };
